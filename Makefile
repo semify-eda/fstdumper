@@ -43,5 +43,5 @@ simulation-xrun: fstdumper.so
 
 .PHONY: clean
 clean:
-	rm -f $(obj) fstdumper.so
+	rm -f $(obj) *.so *.so.vpi *.vvp *.fst
 
