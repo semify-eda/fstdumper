@@ -934,58 +934,58 @@ void sys_fst_register(void)
       /* All the compiletf routines are located in vcd_priv.c. */
 
       tf_data.type      = vpiSysTask;
-      tf_data.tfname    = "$dumpall";
+      tf_data.tfname    = "$fstDumpall";
       tf_data.calltf    = sys_dumpall_calltf;
       tf_data.compiletf = sys_no_arg_compiletf;
       tf_data.sizetf    = 0;
-      tf_data.user_data = "$dumpall";
+      tf_data.user_data = "$fstDumpall";
       res = vpi_register_systf(&tf_data);
 
       tf_data.type      = vpiSysTask;
-      tf_data.tfname    = "$dumpfile";
+      tf_data.tfname    = "$fstDumpfile";
       tf_data.calltf    = sys_dumpfile_calltf;
       tf_data.compiletf = sys_one_string_arg_compiletf;
       tf_data.sizetf    = 0;
-      tf_data.user_data = "$dumpfile";
+      tf_data.user_data = "$fstDumpfile";
       res = vpi_register_systf(&tf_data);
 
       tf_data.type      = vpiSysTask;
-      tf_data.tfname    = "$dumpflush";
+      tf_data.tfname    = "$fstDumpflush";
       tf_data.calltf    = sys_dumpflush_calltf;
       tf_data.compiletf = sys_no_arg_compiletf;
       tf_data.sizetf    = 0;
-      tf_data.user_data = "$dumpflush";
+      tf_data.user_data = "$fstDumpflush";
       res = vpi_register_systf(&tf_data);
 
       tf_data.type      = vpiSysTask;
-      tf_data.tfname    = "$dumplimit";
+      tf_data.tfname    = "$fstDumplimit";
       tf_data.calltf    = sys_dumplimit_calltf;
       tf_data.compiletf = sys_one_numeric_arg_compiletf;
       tf_data.sizetf    = 0;
-      tf_data.user_data = "$dumplimit";
+      tf_data.user_data = "$fstDumplimit";
       res = vpi_register_systf(&tf_data);
 
       tf_data.type      = vpiSysTask;
-      tf_data.tfname    = "$dumpoff";
+      tf_data.tfname    = "$fstDumpoff";
       tf_data.calltf    = sys_dumpoff_calltf;
       tf_data.compiletf = sys_no_arg_compiletf;
       tf_data.sizetf    = 0;
-      tf_data.user_data = "$dumpoff";
+      tf_data.user_data = "$fstDumpoff";
       res = vpi_register_systf(&tf_data);
 
       tf_data.type      = vpiSysTask;
-      tf_data.tfname    = "$dumpon";
+      tf_data.tfname    = "$fstDumpon";
       tf_data.calltf    = sys_dumpon_calltf;
       tf_data.compiletf = sys_no_arg_compiletf;
       tf_data.sizetf    = 0;
-      tf_data.user_data = "$dumpon";
+      tf_data.user_data = "$fstDumpon";
       res = vpi_register_systf(&tf_data);
 
       tf_data.type      = vpiSysTask;
-      tf_data.tfname    = "$dumpvars";
+      tf_data.tfname    = "$fstDumpvars";
       tf_data.calltf    = sys_dumpvars_calltf;
       tf_data.compiletf = sys_dumpvars_compiletf;
       tf_data.sizetf    = 0;
-      tf_data.user_data = "$dumpvars";
+      tf_data.user_data = "$fstDumpvars";
       res = vpi_register_systf(&tf_data);
 }
