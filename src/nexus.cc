@@ -17,6 +17,8 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#ifdef ICARUS_VERILOG
+
 # include  "vcd_priv.h"
 # include  <map>
 # include  <set>
@@ -78,3 +80,5 @@ extern "C" void vcd_scope_names_delete(void)
 {
       vcd_scope_names_set.clear();
 }
+
+#endif

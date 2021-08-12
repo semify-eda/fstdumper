@@ -27,6 +27,15 @@
 #  endif
 #endif
 
+/* 
+   The original FST dumper from Icarus Verilog uses certain extensions not available 
+   on other simulators to optimize the dumping. For example the Nexus Id cache helps 
+   in deduplicating signals, saving CPU time because of less callbacks and resulting 
+   in a smaller file size. For other simulators this and other features have to be
+   disabled. When compiling for Icarus Verilog this can be enabled the define below.   
+*/
+// #define ICARUS_VERILOG
+
 /* These two are needed by the lxt and lxt2 files (copied from GTKWave). */
 # undef HAVE_ALLOCA_H
 # undef HAVE_FSEEKO
