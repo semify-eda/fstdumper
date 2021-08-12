@@ -151,7 +151,9 @@ PLI_INT32 sys_dumpvars_compiletf(ICARUS_VPI_CONST PLI_BYTE8 *name)
             vpi_printf("ERROR: %s:%d: ", vpi_get_str(vpiFile, callh),
                        (int)vpi_get(vpiLineNo, callh));
             vpi_printf("%s's argument must be numeric.\n", name);
+	    #ifdef ICARUS_VERILOG
 	    vpip_set_return_value(1);
+	    #endif
             vpi_control(vpiFinish, 1);
       }
 
@@ -174,7 +176,9 @@ PLI_INT32 sys_dumpvars_compiletf(ICARUS_VPI_CONST PLI_BYTE8 *name)
 		             (int)vpi_get(vpiLineNo, callh));
 		  vpi_printf("%s cannot dump a non-constant select %s.\n", name,
 		             vpi_get_str(vpiType, arg));
+		  #ifdef ICARUS_VERILOG
 		  vpip_set_return_value(1);
+		  #endif
 		  vpi_control(vpiFinish, 1);
             }
 #endif
@@ -213,7 +217,9 @@ PLI_INT32 sys_dumpvars_compiletf(ICARUS_VPI_CONST PLI_BYTE8 *name)
                        (int)vpi_get(vpiLineNo, callh));
             vpi_printf("%s cannot dump a %s.\n", name,
                        vpi_get_str(vpiType, arg));
+	    #ifdef ICARUS_VERILOG
 	    vpip_set_return_value(1);
+	    #endif
             vpi_control(vpiFinish, 1);
         }
       }

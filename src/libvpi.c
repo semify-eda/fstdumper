@@ -254,6 +254,8 @@ FILE*vpi_get_file(PLI_INT32 fd)
 
 // Icarus extensions
 
+#ifdef ICARUS_VERILOG
+
 s_vpi_vecval vpip_calc_clog2(vpiHandle arg)
 {
       assert(vpip_routines);
@@ -293,6 +295,8 @@ DLLEXPORT PLI_UINT32 vpip_set_callback(vpip_routines_s*routines, PLI_UINT32 vers
       vpip_routines = routines;
       return 1;
 }
+
+#endif
 
 #else
 

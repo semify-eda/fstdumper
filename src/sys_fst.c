@@ -241,7 +241,9 @@ static PLI_INT32 finish_cb(p_cb_data cause)
       vcd_list = 0;
       vcd_names_delete(&fst_tab);
       vcd_names_delete(&fst_var);
+      # ifdef ICARUS_VERILOG
       nexus_ident_delete();
+      # endif
       free(dump_path);
       dump_path = 0;
 
@@ -372,7 +374,9 @@ static void open_dumpfile(vpiHandle callh)
 	    vpi_printf("FST Error: %s:%d: ", vpi_get_str(vpiFile, callh),
 	               (int)vpi_get(vpiLineNo, callh));
 	    vpi_printf("Unable to open %s for output.\n", dump_path);
+	    # ifdef ICARUS_VERILOG
 	    vpip_set_return_value(1);
+	    # endif
 	    vpi_control(vpiFinish, 1);
 	    free(dump_path);
 	    dump_path = 0;
@@ -603,10 +607,14 @@ static void scan_item(unsigned depth, vpiHandle item, int skip)
 	    } else escname = strdup(name);
 
 	      /* Some signals can have an alias so handle that. */
+	    # ifdef ICARUS_VERILOG
 	    nexus_id = vpi_get(_vpiNexusId, item);
+	    # endif
 
 	    ident = 0;
+	    # ifdef ICARUS_VERILOG
 	    if (nexus_id) ident = find_nexus_ident(nexus_id);
+	    # endif
 
 	      /* Named events do not have a size, but other tools use
 	       * a size of 1 and some viewers do not accept a width of
@@ -636,8 +644,10 @@ static void scan_item(unsigned depth, vpiHandle item, int skip)
 	    free(escname);
 
 	    if (!ident) {
+		  # ifdef ICARUS_VERILOG
 		  if (nexus_id) set_nexus_ident(nexus_id,
 		                                (const char *)(intptr_t)new_ident);
+		  # endif
 
 		    /* Add a callback for the signal. */
 		  info = malloc(sizeof(*info));
@@ -930,7 +940,6 @@ void sys_fst_register(void)
       tf_data.sizetf    = 0;
       tf_data.user_data = "$dumpall";
       res = vpi_register_systf(&tf_data);
-      vpip_make_systf_system_defined(res);
 
       tf_data.type      = vpiSysTask;
       tf_data.tfname    = "$dumpfile";
@@ -939,7 +948,6 @@ void sys_fst_register(void)
       tf_data.sizetf    = 0;
       tf_data.user_data = "$dumpfile";
       res = vpi_register_systf(&tf_data);
-      vpip_make_systf_system_defined(res);
 
       tf_data.type      = vpiSysTask;
       tf_data.tfname    = "$dumpflush";
@@ -948,7 +956,6 @@ void sys_fst_register(void)
       tf_data.sizetf    = 0;
       tf_data.user_data = "$dumpflush";
       res = vpi_register_systf(&tf_data);
-      vpip_make_systf_system_defined(res);
 
       tf_data.type      = vpiSysTask;
       tf_data.tfname    = "$dumplimit";
@@ -957,7 +964,6 @@ void sys_fst_register(void)
       tf_data.sizetf    = 0;
       tf_data.user_data = "$dumplimit";
       res = vpi_register_systf(&tf_data);
-      vpip_make_systf_system_defined(res);
 
       tf_data.type      = vpiSysTask;
       tf_data.tfname    = "$dumpoff";
@@ -966,7 +972,6 @@ void sys_fst_register(void)
       tf_data.sizetf    = 0;
       tf_data.user_data = "$dumpoff";
       res = vpi_register_systf(&tf_data);
-      vpip_make_systf_system_defined(res);
 
       tf_data.type      = vpiSysTask;
       tf_data.tfname    = "$dumpon";
@@ -975,7 +980,6 @@ void sys_fst_register(void)
       tf_data.sizetf    = 0;
       tf_data.user_data = "$dumpon";
       res = vpi_register_systf(&tf_data);
-      vpip_make_systf_system_defined(res);
 
       tf_data.type      = vpiSysTask;
       tf_data.tfname    = "$dumpvars";
@@ -984,5 +988,4 @@ void sys_fst_register(void)
       tf_data.sizetf    = 0;
       tf_data.user_data = "$dumpvars";
       res = vpi_register_systf(&tf_data);
-      vpip_make_systf_system_defined(res);
 }
