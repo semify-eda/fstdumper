@@ -27,40 +27,11 @@
 #  endif
 #endif
 
-# undef NEED_LU
-# undef NEED_TU
-# undef WLU
-# undef WTU
-# undef HAVE_TIMES
-# undef HAVE_IOSFWD
-# undef HAVE_GETOPT_H
-# undef HAVE_INTTYPES_H
-# undef HAVE_LIBIBERTY_H
-# undef HAVE_DLFCN_H
-# undef HAVE_DL_H
-# undef HAVE_FCHMOD
-# undef HAVE_LIBREADLINE
-# undef HAVE_LIBZ
-# undef HAVE_LIBBZ2
-# undef HAVE_LROUND
-# undef HAVE_SYS_WAIT_H
-# undef WORDS_BIGENDIAN
-
-#ifdef HAVE_INTTYPES_H
-# include  <inttypes.h>
-#endif
-
 /* These two are needed by the lxt and lxt2 files (copied from GTKWave). */
 # undef HAVE_ALLOCA_H
 # undef HAVE_FSEEKO
 /* And this is needed by the fst files (copied from GTKWave). */
 # undef HAVE_LIBPTHREAD
 # undef HAVE_REALPATH
-
-/*
- * Define this if you want to compile vvp with memory freeing and
- * special valgrind hooks for the memory pools.
- */
-# undef CHECK_WITH_VALGRIND
 
 #endif /* IVL_config_H */

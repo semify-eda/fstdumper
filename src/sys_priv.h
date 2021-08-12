@@ -19,7 +19,6 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "vpi_config.h"
 #include "sv_vpi_user.h"
 
 #define IS_MCD(mcd)     !((mcd)>>31&1)
