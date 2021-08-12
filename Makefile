@@ -13,6 +13,8 @@ default: fstdumper.so
 CFLAGS = -I $(SRCDIR)/config -fPIC -O2
 LDFLAGS = -lz -shared
 
+TESTBENCH = $(wildcard testbench/*.sv)
+
 $(OBJDIR):
 	@mkdir $(OBJDIR)
 
@@ -26,6 +28,15 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cc $(OBJDIR)
 
 fstdumper.so: $(obj)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+
+Vtop.vvp: $(TESTBENCH)
+	iverilog -o $@ -s div_int_tb $(TESTBENCH) -g2012
+
+fstdumper.so.vpi : fstdumper.so
+	@cp $< $@
+
+simulation-iverilog: fstdumper.so.vpi Vtop.vvp
+	vvp -M . -mfstdumper.so Vtop.vvp
 
 .PHONY: clean
 clean:
