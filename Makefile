@@ -10,7 +10,7 @@ $(info $(obj))
 
 default: fstdumper.so
 
-CFLAGS = -I $(SRCDIR)/config -fPIC
+CFLAGS = -I $(SRCDIR)/config -fPIC -O2
 LDFLAGS = -lz -shared
 
 $(OBJDIR):
@@ -20,7 +20,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c $(OBJDIR)
 	@echo Compiling $(<F)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-obj/%.o: src/%.cc $(OBJDIR)
+$(OBJDIR)/%.o: $(SRCDIR)/%.cc $(OBJDIR)
 	@echo Compiling $(<F)
 	$(CXX) -c -o $@ $< $(CFLAGS)
 
