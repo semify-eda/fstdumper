@@ -2,8 +2,8 @@
 SRCDIR = src
 OBJDIR = obj
 
-csrc = $(wildcard $(SRCDIR)/*.c)
-obj = ${subst $(SRCDIR),$(OBJDIR),$(csrc:.c=.o)}
+csrc = $(wildcard $(SRCDIR)/*.c) $(wildcard $(SRCDIR)/*.cc)
+obj = ${subst $(SRCDIR),$(OBJDIR),$(addsuffix .o, $(basename $(csrc)))}
 
 $(info $(csrc))
 $(info $(obj))
@@ -19,6 +19,10 @@ $(OBJDIR):
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(OBJDIR)
 	@echo Compiling $(<F)
 	$(CC) -c -o $@ $< $(CFLAGS)
+
+obj/%.o: src/%.cc $(OBJDIR)
+	@echo Compiling $(<F)
+	$(CXX) -c -o $@ $< $(CFLAGS)
 
 fstdumper.so: $(obj)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
