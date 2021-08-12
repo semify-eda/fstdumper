@@ -225,8 +225,18 @@ static PLI_INT32 finish_cb(p_cb_data cause)
       if (finish_status != 0) return 0;
 
       finish_status = 1;
+      
+      if (cause->time == NULL) {
+	    // Xcelium doesn't seem to populate cause->time
+	    vpiHandle systfref = vpi_handle(vpiSysTfCall, NULL);
+	    s_vpi_time time;
+	    time.type = vpiSimTime;
+	    vpi_get_time(systfref, &time);
 
-      dumpvars_time = timerec_to_time64(cause->time);
+	    dumpvars_time = timerec_to_time64(&time);
+      } else {
+        dumpvars_time = timerec_to_time64(cause->time);
+      }
 
       if (!dump_is_off && !dump_is_full && dumpvars_time != vcd_cur_time) {
 	    fstWriterEmitTimeChange(dump_file, dumpvars_time);
@@ -593,7 +603,11 @@ static void scan_item(unsigned depth, vpiHandle item, int skip)
 
 	      /* If we are skipping all signal or this is in an automatic
 	       * scope then just return. */
+            # ifdef ICARUS_VERILOG
             if (skip || vpi_get(vpiAutomatic, item)) return;
+            # else
+            if (skip) return;
+            # endif
 
 	      /* Skip this signal if it has already been included.
 	       * This can only happen for implicitly given signals. */
@@ -626,6 +640,7 @@ static void scan_item(unsigned depth, vpiHandle item, int skip)
 	       *   FST_VD_INPUT, FST_VD_OUTPUT or FST_VD_INOUT */
 	    dir = FST_VD_IMPLICIT;
 
+	    # ifdef ICARUS_VERILOG
 	    if (size > 1 || vpi_get(vpiLeftRange, item) != 0) {
 		  char *buf = malloc(strlen(escname) + 65);
 		  sprintf(buf, "%s [%i:%i]", escname,
@@ -637,10 +652,13 @@ static void scan_item(unsigned depth, vpiHandle item, int skip)
 		                                 (fstHandle)(intptr_t)ident);
 		  free(buf);
 	    } else {
+		# endif
 		  new_ident = fstWriterCreateVar(dump_file, type,
 		                                 dir, size, escname,
 		                                 (fstHandle)(intptr_t)ident);
+	    # ifdef ICARUS_VERILOG
 	    }
+	    # endif
 	    free(escname);
 
 	    if (!ident) {
@@ -744,6 +762,20 @@ static void scan_item(unsigned depth, vpiHandle item, int skip)
 
 		  for (i=0; types[i]>0; i++) {
 			vpiHandle hand;
+			
+			# ifndef ICARUS_VERILOG
+			// Workaround for Xcelium
+			if (item_type == vpiModule) {
+			  if (types[i] == vpiFunction || 
+			      types[i] == vpiGenScope || 
+			      types[i] == vpiNamedBegin || 
+			      types[i] == vpiNamedFork || 
+			      types[i] == vpiTask) {
+			    continue;
+			  }
+			}
+			# endif
+			
 			vpiHandle argv = vpi_iterate(types[i], item);
 			while (argv && (hand = vpi_scan(argv))) {
 			      scan_item(depth-1, hand, nskip);

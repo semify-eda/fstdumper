@@ -38,6 +38,9 @@ fstdumper.so.vpi : fstdumper.so
 simulation-iverilog: fstdumper.so.vpi Vtop.vvp
 	vvp -M . -mfstdumper.so Vtop.vvp
 
+simulation-xrun: fstdumper.so
+	xrun -64bit +access+r -loadvpi ./fstdumper.so:vlog_startup_routines_bootstrap $(TESTBENCH) -top div_int_tb
+
 .PHONY: clean
 clean:
 	rm -f $(obj) fstdumper.so
