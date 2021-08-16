@@ -12,8 +12,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Install dependencies
-      run: sudo apt install -y iverilog
+    #- name: Install dependencies
+    #  run: sudo apt install -y iverilog
 
     - name: Compile build
       run: |
@@ -27,6 +27,6 @@ jobs:
           fstdumper.so.vpi
         retention-days: 7
 
-    - name: Run Icarus Verilog example
-      run: |
-        make simulation-iverilog
+    #- name: Run Icarus Verilog example
+    #  run: |
+    #    make simulation-iverilog
