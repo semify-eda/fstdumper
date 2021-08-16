@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Install dependencies
+      run: sudo apt install -y iverilog
+
+    - name: Compile build
+      run: |
+        make fstdumper.so
+        make fstdumper.so.vpi
+    - uses: actions/upload-artifact@v2
+      with:
+        name: fstdumper
+        path: |
+          fstdumper.so
+          fstdumper.so.vpi
+        retention-days: 7
+
+    - name: Run Icarus Verilog example
+      run: |
+        make simulation-iverilog
