@@ -1,5 +1,5 @@
-<a href="https://github.com/semify-eda/fstdump/releases/latest">
-<img align="right" src="https://github.com/semify-eda/fstdump/actions/workflows/compile.yml/badge.svg">
+<a href="https://github.com/semify-eda/fstdumper/releases/latest">
+<img align="right" src="https://github.com/semify-eda/fstdumper/actions/workflows/compile.yml/badge.svg">
 </a>
 
 # fstdumper
