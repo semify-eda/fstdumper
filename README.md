@@ -1,13 +1,14 @@
+<a href="https://github.com/semify-eda/fstdump/releases/latest">
+<img align="right" src="https://github.com/semify-eda/fstdump/actions/workflows/compile.yml/badge.svg">
+</a>
+
 # fstdumper
 Verilog VPI module to dump FST (Fast Signal Trace) databases
 
 ![fstdumper overview](doc/fstdump_overview.svg)
 
 
-> FST: Fast Signal Trace. This format is a block-based variant of IDX which is designed for very fast sequential and random access.
-
-
-> FST has been designed to handle extremely large designs efficiently.
+> FST: Fast Signal Trace. This format is a block-based variant of IDX which is designed for very fast sequential and random access. FST has been designed to handle extremely large designs efficiently.
 
 # Overview
 
