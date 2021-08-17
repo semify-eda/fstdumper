@@ -87,7 +87,8 @@ make simulation-xrun
 |-----------------|-----------------------|--------|
 | Icarus Verilog  | Version 11.0 (stable) | works  |
 | Cadence Xcelium | 19.09-s001            | works  |
-|                 |                       |        |
+| Cadence Xcelium | 18.03-s007            | works  |
+| QuestaSim       | 10.7                  | WIP    |
 
 You too can contribute by testing `fstdumper` on other simulators or other versions of these simulators. Any help is very much appreciated!
 
