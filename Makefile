@@ -41,6 +41,10 @@ simulation-iverilog: fstdumper.so.vpi Vtop.vvp
 simulation-xrun: fstdumper.so
 	xrun -64bit +access+r -loadvpi ./fstdumper.so:vlog_startup_routines_bootstrap $(TESTBENCH) -top div_int_tb
 
+simulation-vsim: fstdumper.so
+	vlog -64 $(TESTBENCH)
+	vsim -64 -c div_int_tb -vpicompatcb -plicompatdefault latest -pli fstdumper.so -do "run -all"
+
 .PHONY: clean
 clean:
 	rm -f $(obj) *.so *.so.vpi *.vvp *.fst
