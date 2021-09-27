@@ -5,7 +5,7 @@
 # fstdumper
 Verilog VPI module to dump FST (Fast Signal Trace) databases
 
-![fstdumper overview](doc/fstdump_overview.svg)
+![fstdumper overview](doc/fstdumper_overview.svg)
 
 
 > FST: Fast Signal Trace. This format is a block-based variant of IDX which is designed for very fast sequential and random access. FST has been designed to handle extremely large designs efficiently.
