@@ -945,6 +945,8 @@ void sys_fst_register(void)
       s_vpi_systf_data tf_data;
       vpiHandle res;
 
+#ifdef EXTENDED_ARGS
+
 	/* Scan the extended arguments, looking for fst optimization flags. */
       vpi_get_vlog_info(&vlog_info);
 
@@ -962,6 +964,8 @@ void sys_fst_register(void)
 		  lxm_optimum_mode = LXM_BOTH;
 	    }
       }
+
+#endif
 
       /* All the compiletf routines are located in vcd_priv.c. */
 
