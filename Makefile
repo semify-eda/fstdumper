@@ -43,7 +43,11 @@ simulation-xrun: fstdumper.so
 
 simulation-vsim: fstdumper.so
 	vlog -64 $(TESTBENCH)
-	vsim -64 -c div_int_tb -vpicompatcb -plicompatdefault latest -pli fstdumper.so -do "run -all"
+	vsim -64 -c div_int_tb -vpicompatcb -pli fstdumper.so -do "run -all"
+
+simulation-vcs: fstdumper.so
+	vcs -sverilog -full64 +vpi -load ./fstdumper.so -debug_acc+pp+f+dmptf $(TESTBENCH)
+	./simv
 
 .PHONY: clean
 clean:
