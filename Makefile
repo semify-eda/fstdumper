@@ -8,9 +8,9 @@ obj = ${subst $(SRCDIR),$(OBJDIR),$(addsuffix .o, $(basename $(csrc)))}
 $(info $(csrc))
 $(info $(obj))
 
-default: fstdumper.so
+all: fstdumper.so
 
-CFLAGS = -I $(SRCDIR)/config -fPIC -O2
+CFLAGS = -I $(SRCDIR)/config -fPIC -O2 -DDEBUG
 LDFLAGS = -lz -shared
 
 TESTBENCH = $(wildcard testbench/*.sv)
@@ -49,7 +49,7 @@ simulation-vcs: fstdumper.so
 	vcs -sverilog -full64 +vpi -load ./fstdumper.so -debug_acc+pp+f+dmptf $(TESTBENCH)
 	./simv
 
-.PHONY: clean
+.PHONY: clean all simulation-iverilog simulation-xrun simulation-vsim
 clean:
 	rm -f $(obj) *.so *.so.vpi *.vvp *.fst
 

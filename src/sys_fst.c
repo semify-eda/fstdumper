@@ -20,6 +20,7 @@
 # include "sys_priv.h"
 # include "vcd_priv.h"
 # include "fstapi.h"
+# include "debug.h"
 
 /*
  * This file contains the implementations of the FST related functions.
@@ -75,6 +76,8 @@ static const char*units_names[] = {
 
 static void show_this_item(struct vcd_info*info)
 {
+      debug_print("show_this_item\n");
+
       s_vpi_value value;
       PLI_INT32 type = vpi_get(vpiType, info->item);
 
@@ -87,11 +90,15 @@ static void show_this_item(struct vcd_info*info)
 	    vpi_get_value(info->item, &value);
 	    fstWriterEmitValueChange(dump_file, info->handle, (type != vpiNamedEvent) ? value.value.str : "1");
       }
+      
+      debug_print("show_this_item done\n");
 }
 
 /* Dump values for a $dumpoff. */
 static void show_this_item_x(struct vcd_info*info)
 {
+      debug_print("show_this_item_x\n");
+
       PLI_INT32 type = vpi_get(vpiType, info->item);
 
       if (type == vpiRealVar) {
@@ -107,6 +114,8 @@ static void show_this_item_x(struct vcd_info*info)
 	    fstWriterEmitValueChange(dump_file, info->handle, xmem);
 	    free(xmem);
       }
+      
+      debug_print("show_this_item_x done\n");
 }
 
 
@@ -122,6 +131,7 @@ static int dumpvars_status = 0; /* 0:fresh 1:cb installed, 2:callback done */
 static PLI_UINT64 dumpvars_time;
 __inline__ static int dump_header_pending(void)
 {
+      debug_print("dump_header_pending %d\n", dumpvars_status);
       return dumpvars_status != 2;
 }
 
@@ -131,24 +141,37 @@ __inline__ static int dump_header_pending(void)
  */
 static void vcd_checkpoint(void)
 {
+      debug_print("vcd_checkpoint\n");
+
       struct vcd_info*cur;
 
       for (cur = vcd_list ;  cur ;  cur = cur->next)
 	    show_this_item(cur);
+	    
+      debug_print("vcd_checkpoint done\n");
 }
 
 static void vcd_checkpoint_x(void)
 {
+      debug_print("vcd_checkpoint_x\n");
+
       struct vcd_info*cur;
 
       for (cur = vcd_list ;  cur ;  cur = cur->next)
 	    show_this_item_x(cur);
+	    
+      debug_print("vcd_checkpoint_x done\n");
 }
 
 static PLI_INT32 variable_cb_2(p_cb_data cause)
 {
+      debug_print("variable_cb_2\n");
+
       struct vcd_info* info = vcd_dmp_list;
       PLI_UINT64 now = timerec_to_time64(cause->time);
+
+      debug_print("now %d\n", now);
+      debug_print("vcd_cur_time %d\n", vcd_cur_time);
 
       if (now != vcd_cur_time) {
 	    fstWriterEmitTimeChange(dump_file, now);
@@ -162,11 +185,15 @@ static PLI_INT32 variable_cb_2(p_cb_data cause)
 
       vcd_dmp_list = 0;
 
+      debug_print("variable_cb_2 done\n");
+
       return 0;
 }
 
 static PLI_INT32 variable_cb_1(p_cb_data cause)
 {
+      debug_print("variable_cb_1 %p\n", cause->user_data);
+
       struct t_cb_data cb;
       struct vcd_info*info = (struct vcd_info*)cause->user_data;
 
@@ -187,6 +214,9 @@ static PLI_INT32 variable_cb_1(p_cb_data cause)
 	  cb.time = &zero_delay;
           cb.reason = cbReadOnlySynch;
           cb.cb_rtn = variable_cb_2;
+          
+          debug_print("register variable_cb_2\n");
+          
           vpi_register_cb(&cb);
       }
 
@@ -194,17 +224,23 @@ static PLI_INT32 variable_cb_1(p_cb_data cause)
       info->dmp_next  = vcd_dmp_list;
       vcd_dmp_list    = info;
 
+      debug_print("variable_cb_1 %p done\n", cause->user_data);
+
       return 0;
 }
 
 static PLI_INT32 dumpvars_cb(p_cb_data cause)
 {
+      debug_print("dumpvars_cb %d\n", cause->reason);
+
       if (dumpvars_status != 1) return 0;
 
       dumpvars_status = 2;
 
       dumpvars_time = timerec_to_time64(cause->time);
       vcd_cur_time = dumpvars_time;
+
+      debug_print("dumpvars_time %d\n", dumpvars_time);
 
       /* nothing to do for $enddefinitions $end */
 
@@ -214,12 +250,16 @@ static PLI_INT32 dumpvars_cb(p_cb_data cause)
 	    vcd_checkpoint();
 	    /* ...nothing to do for $end */
       }
+      
+      debug_print("dumpvars_cb %d done\n", cause->reason);
 
       return 0;
 }
 
 static PLI_INT32 finish_cb(p_cb_data cause)
 {
+      debug_print("finish_cb %d %p\n", cause->reason, cause->time);
+
       struct vcd_info *cur, *next;
 
       if (finish_status != 0) return 0;
@@ -237,6 +277,8 @@ static PLI_INT32 finish_cb(p_cb_data cause)
       } else {
         dumpvars_time = timerec_to_time64(cause->time);
       }
+      
+      debug_print("dumpvars_time %d\n", dumpvars_time);
 
       if (!dump_is_off && !dump_is_full && dumpvars_time != vcd_cur_time) {
 	    fstWriterEmitTimeChange(dump_file, dumpvars_time);
@@ -257,11 +299,15 @@ static PLI_INT32 finish_cb(p_cb_data cause)
       free(dump_path);
       dump_path = 0;
 
+      debug_print("finish_cb %d %p done\n", cause->reason, cause->time);
+
       return 0;
 }
 
 __inline__ static int install_dumpvars_callback(void)
 {
+      debug_print("install_dumpvars_callback\n");
+
       struct t_cb_data cb;
 
       if (dumpvars_status == 1) return 0;
@@ -287,15 +333,18 @@ __inline__ static int install_dumpvars_callback(void)
       vpi_register_cb(&cb);
 
       dumpvars_status = 1;
+      
+      debug_print("install_dumpvars_callback done\n");
+      
       return 0;
 }
 
 static PLI_INT32 sys_dumpoff_calltf(ICARUS_VPI_CONST PLI_BYTE8*name)
 {
+      debug_print("sys_dumpoff_calltf %s\n", name);
+
       s_vpi_time now;
       PLI_UINT64 now64;
-
-      (void)name; /* Parameter is not used. */
 
       if (dump_is_off) return 0;
 
@@ -316,15 +365,17 @@ static PLI_INT32 sys_dumpoff_calltf(ICARUS_VPI_CONST PLI_BYTE8*name)
       fstWriterEmitDumpActive(dump_file, 0); /* $dumpoff */
       vcd_checkpoint_x();
 
+      debug_print("sys_dumpoff_calltf %s done\n", name);
+
       return 0;
 }
 
 static PLI_INT32 sys_dumpon_calltf(ICARUS_VPI_CONST PLI_BYTE8*name)
 {
+      debug_print("sys_dumpon_calltf %s\n", name);
+
       s_vpi_time now;
       PLI_UINT64 now64;
-
-      (void)name; /* Parameter is not used. */
 
       if (!dump_is_off) return 0;
 
@@ -345,11 +396,15 @@ static PLI_INT32 sys_dumpon_calltf(ICARUS_VPI_CONST PLI_BYTE8*name)
       fstWriterEmitDumpActive(dump_file, 1); /* $dumpon */
       vcd_checkpoint();
 
+      debug_print("sys_dumpon_calltf %s done\n", name);
+
       return 0;
 }
 
 static PLI_INT32 sys_dumpall_calltf(ICARUS_VPI_CONST PLI_BYTE8*name)
 {
+      debug_print("sys_dumpall_calltf %s\n", name);
+
       s_vpi_time now;
       PLI_UINT64 now64;
 
@@ -371,11 +426,15 @@ static PLI_INT32 sys_dumpall_calltf(ICARUS_VPI_CONST PLI_BYTE8*name)
       /* nothing to do for $dumpall... */
       vcd_checkpoint();
 
+      debug_print("sys_dumpall_calltf %s done\n", name);
+
       return 0;
 }
 
 static void open_dumpfile(vpiHandle callh)
 {
+      debug_print("open_dumpfile %s\n", vpi_get_str(vpiName, callh));
+
       if (dump_path == 0) dump_path = strdup("dump.fst");
 
       dump_file = fstWriterCreate(dump_path, 1);
@@ -428,10 +487,14 @@ static void open_dumpfile(vpiHandle callh)
 		  fstWriterSetRepackOnClose(dump_file, 1);
 	    }
       }
+      
+      debug_print("open_dumpfile %s done\n", vpi_get_str(vpiName, callh));
 }
 
 static PLI_INT32 sys_dumpfile_calltf(ICARUS_VPI_CONST PLI_BYTE8*name)
 {
+      debug_print("sys_dumpfile_calltf %s\n", name);
+
       vpiHandle callh = vpi_handle(vpiSysTfCall, 0);
       vpiHandle argv = vpi_iterate(vpiArgument, callh);
       char *path;
@@ -452,6 +515,9 @@ static PLI_INT32 sys_dumpfile_calltf(ICARUS_VPI_CONST PLI_BYTE8*name)
 
       path = get_filename_with_suffix(callh, name, vpi_scan(argv), "fst");
       vpi_free_object(argv);
+      
+      debug_print("path = %s\n", path);
+      
       if (! path) return 0;
 
       if (dump_path) {
@@ -462,19 +528,27 @@ static PLI_INT32 sys_dumpfile_calltf(ICARUS_VPI_CONST PLI_BYTE8*name)
       }
       dump_path = path;
 
+      debug_print("sys_dumpfile_calltf %s done\n", name);
+
       return 0;
 }
 
 static PLI_INT32 sys_dumpflush_calltf(ICARUS_VPI_CONST PLI_BYTE8*name)
 {
+      debug_print("sys_dumpflush_calltf %s\n", name);
+
       (void)name; /* Parameter is not used. */
       if (dump_file) fstWriterFlushContext(dump_file);
+
+      debug_print("sys_dumpflush_calltf %s done\n", name);
 
       return 0;
 }
 
 static PLI_INT32 sys_dumplimit_calltf(ICARUS_VPI_CONST PLI_BYTE8 *name)
 {
+      debug_print("sys_dumplimit_calltf %s\n", name);
+
       vpiHandle callh = vpi_handle(vpiSysTfCall, 0);
       vpiHandle argv = vpi_iterate(vpiArgument, callh);
       s_vpi_value val;
@@ -488,11 +562,16 @@ static PLI_INT32 sys_dumplimit_calltf(ICARUS_VPI_CONST PLI_BYTE8 *name)
       fstWriterSetDumpSizeLimit(dump_file, dump_limit);
 
       vpi_free_object(argv);
+      
+      debug_print("sys_dumplimit_calltf %s done\n", name);
+      
       return 0;
 }
 
 static void scan_item(unsigned depth, vpiHandle item, int skip)
 {
+      debug_print("scan_item %d %s %d\n", depth, vpi_get_str(vpiFullName, item), skip);
+
       struct t_cb_data cb;
       struct vcd_info* info;
 
@@ -686,6 +765,8 @@ static void scan_item(unsigned depth, vpiHandle item, int skip)
 		  info->next  = vcd_list;
 		  vcd_list    = info;
 
+                  debug_print("register variable_cb_1\n");
+
 		  info->cb    = vpi_register_cb(&cb);
 	    }
 
@@ -787,10 +868,14 @@ static void scan_item(unsigned depth, vpiHandle item, int skip)
 	    }
 	    break;
       }
+      
+      debug_print("scan_item %d %s %d done\n", depth, vpi_get_str(vpiFullName, item), skip);
 }
 
 static int draw_scope(vpiHandle item, vpiHandle callh)
 {
+      debug_print("draw_scope %s %s\n", vpi_get_str(vpiName, item), vpi_get_str(vpiName, callh));
+
       int depth;
       const char *name;
       char *defname = NULL;
@@ -833,28 +918,32 @@ static int draw_scope(vpiHandle item, vpiHandle callh)
       fstWriterSetScope(dump_file, type, name, defname);
       free(defname);
 
+      debug_print("draw_scope %s %s done\n", vpi_get_str(vpiName, item), vpi_get_str(vpiName, callh));
+
       return depth;
 }
 
 static PLI_INT32 sys_dumpvars_calltf(ICARUS_VPI_CONST PLI_BYTE8*name)
 {
+      debug_print("sys_dumpvars_calltf %s\n", name);
+
       vpiHandle callh = vpi_handle(vpiSysTfCall, 0);
       vpiHandle argv = vpi_iterate(vpiArgument, callh);
       vpiHandle item;
       s_vpi_value value;
       unsigned depth = 0;
 
-      (void)name; /* Parameter is not used. */
-
       if (dump_file == 0) {
 	    open_dumpfile(callh);
 	    if (dump_file == 0) {
+	          debug_print("Could not open dump_file!\n");
 		  if (argv) vpi_free_object(argv);
 		  return 0;
 	    }
       }
 
       if (install_dumpvars_callback()) {
+            debug_print("Could not install_dumpvars_callback!\n");
 	    if (argv) vpi_free_object(argv);
 	    return 0;
       }
@@ -866,6 +955,8 @@ static PLI_INT32 sys_dumpvars_calltf(ICARUS_VPI_CONST PLI_BYTE8*name)
 	    depth = value.value.integer;
       }
       if (!depth) depth = 10000;
+
+      debug_print("depth = %d\n", depth);
 
         /* This dumps all the instances in the design if none are given. */
       if (!argv || !(item = vpi_scan(argv))) {
@@ -880,6 +971,8 @@ static PLI_INT32 sys_dumpvars_calltf(ICARUS_VPI_CONST PLI_BYTE8*name)
 	    int add_var = 0;
 	    int dep;
 	    PLI_INT32 item_type = vpi_get(vpiType, item);
+
+            debug_print("dumping item %s\n", vpi_get_str(vpiName, item));
 
 	      /* If this is a signal make sure it has not already
 	       * been included. */
@@ -920,6 +1013,7 @@ static PLI_INT32 sys_dumpvars_calltf(ICARUS_VPI_CONST PLI_BYTE8*name)
 
 	    dep = draw_scope(item, callh);
 
+            debug_print("scanning item %s with depth = %d\n", vpi_get_str(vpiName, item), depth);
 	    scan_item(depth, item, 0);
 	      /* The scope list must be sorted after we scan an item.  */
 	    vcd_names_sort(&fst_tab);
@@ -935,11 +1029,15 @@ static PLI_INT32 sys_dumpvars_calltf(ICARUS_VPI_CONST PLI_BYTE8*name)
 	    }
       }
 
+      debug_print("sys_dumpvars_calltf %s done\n", name);
+
       return 0;
 }
 
 void sys_fst_register(void)
 {
+      debug_print("sys_fst_register called\n");
+
       int idx;
       struct t_vpi_vlog_info vlog_info;
       s_vpi_systf_data tf_data;
