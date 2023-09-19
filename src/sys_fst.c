@@ -170,8 +170,8 @@ static PLI_INT32 variable_cb_2(p_cb_data cause)
       struct vcd_info* info = vcd_dmp_list;
       PLI_UINT64 now = timerec_to_time64(cause->time);
 
-      debug_print("now %d\n", now);
-      debug_print("vcd_cur_time %d\n", vcd_cur_time);
+      debug_print("now %ld\n", now);
+      debug_print("vcd_cur_time %ld\n", vcd_cur_time);
 
       if (now != vcd_cur_time) {
 	    fstWriterEmitTimeChange(dump_file, now);
@@ -240,7 +240,7 @@ static PLI_INT32 dumpvars_cb(p_cb_data cause)
       dumpvars_time = timerec_to_time64(cause->time);
       vcd_cur_time = dumpvars_time;
 
-      debug_print("dumpvars_time %d\n", dumpvars_time);
+      debug_print("dumpvars_time %ld\n", dumpvars_time);
 
       /* nothing to do for $enddefinitions $end */
 
@@ -278,7 +278,7 @@ static PLI_INT32 finish_cb(p_cb_data cause)
         dumpvars_time = timerec_to_time64(cause->time);
       }
       
-      debug_print("dumpvars_time %d\n", dumpvars_time);
+      debug_print("dumpvars_time %ld\n", dumpvars_time);
 
       if (!dump_is_off && !dump_is_full && dumpvars_time != vcd_cur_time) {
 	    fstWriterEmitTimeChange(dump_file, dumpvars_time);
